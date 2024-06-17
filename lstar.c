@@ -120,6 +120,16 @@ list_files(const char *tarbuf)
     hdr = (void *)addr;
 
     /*
+     * Most tar archives have the "ustar" signature. If we do
+     * not find it, we can assume the archive is corrupted and
+     * reject it.
+     */
+    if (strncmp(hdr->magic, "ustar", 5) != 0) {
+        printf("lstar: Invalid magic, expected 'ustar'\n");
+        return;
+    }
+
+    /*
      * If the magic isn't set, we can assume we've reached
      * the end of the archive. TAR archives are made up of
      * 512 byte blocks. Even if the file doesn't completely
